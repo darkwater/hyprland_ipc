@@ -44,7 +44,7 @@ class HyprlandIPC {
       for (String event in events) {
         try {
           yield Event.fromString(event);
-        } on UnknownHyprlandEventException catch (e) { }
+        } on UnknownHyprlandEventException catch (e) {}
       }
     }
   }
@@ -338,19 +338,24 @@ class HyprlandIPC {
     return layers;
   }
 
-  static Future<HyprlandIPC> fromInstance({String? instance}) async {
+  static Future<HyprlandIPC> fromInstance({
+    String? instance,
+    String? runtimeDir,
+  }) async {
+    runtimeDir = runtimeDir ?? Platform.environment["XDG_RUNTIME_DIR"];
     instance = instance ?? Platform.environment["HYPRLAND_INSTANCE_SIGNATURE"];
+    assert(runtimeDir != null);
     assert(instance != null);
     return HyprlandIPC(
       createSocketConnection: () async => await Socket.connect(
           InternetAddress(
-            "/tmp/hypr/$instance/.socket.sock",
+            "$runtimeDir/hypr/$instance/.socket.sock",
             type: InternetAddressType.unix,
           ),
           0),
       socket2: await Socket.connect(
           InternetAddress(
-            "/tmp/hypr/$instance/.socket2.sock",
+            "$runtimeDir/hypr/$instance/.socket2.sock",
             type: InternetAddressType.unix,
           ),
           0),
