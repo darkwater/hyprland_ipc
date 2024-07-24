@@ -32,6 +32,7 @@ class HyprlandIPC {
     await for (final data in socket) {
       result += utf8.decode(data);
     }
+    socket.close();
     return result;
   }
 
